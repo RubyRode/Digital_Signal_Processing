@@ -7,9 +7,11 @@ from math import *
 
 class Ff:
 
-    def __init__(self, lp=np.linspace(-10, 10, 1000), amplitude=2, sig=square):
+    def __init__(self, f=0.5, lp=np.linspace(-np.pi, np.pi, 1000), amplitude=2, sig=square):
         self.x = lp
         self.A = amplitude
+        self.f = f
+        self.T = 1 / self.f
         self.signal = sig(self.x) * self.A
         self.func = sig
 
@@ -20,7 +22,6 @@ class Ff:
         self.error = []
 
         self.sm = 0
-        self.T = 2
 
         self.l_cos = lambda x, i: self.func(x) * cos(i * x)
         self.l_sin = lambda x, i: self.func(x) * sin(i * x)
@@ -42,11 +43,10 @@ class Ff:
     def main(self):
         for i in range(self.n):
             if i == 0.0:
-                self.sm += self.An[i] / 2
+                self.sm += self.An[i] / 2 * self.A / 2
 
             else:
-                self.sm = self.sm + (self.An[i] * np.cos(i * self.x) + self.Bn[i] * np.sin(i * self.x))
-
+                self.sm += (self.An[i] * np.cos(i * self.x) + self.Bn[i] * np.sin(i * self.x)) * self.A / 2
 
     def forward(self):
         self.a_n()
@@ -59,9 +59,11 @@ class Ff:
         fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
         ax1.grid(1)
         ax2.grid(1)
-        ax1.plot(self.x, self.signal)
-        ax1.plot(self.x, self.sm)
-        ax2.plot(self.x, self.error)
+        ax2.set_ylim([-self.A - 1, self.A + 1])
+        ax1.set_ylim([-self.A - 1, self.A + 1])
+        ax1.plot(self.x, self.signal, 'r')
+        ax1.plot(self.x, self.sm, 'b')
+        ax2.plot(self.x, self.error, 'g')
         plt.show()
 
 
@@ -69,7 +71,6 @@ x = np.linspace(-10, 10, 1000)
 
 
 def cosine(lp):
-
     try:
         cs = []
         for i in range(len(lp)):
@@ -79,7 +80,5 @@ def cosine(lp):
     return np.array(cs)
 
 
-
-
-p = Ff(sig=square)
+p = Ff(sig=square, amplitude=7)
 p.forward()
