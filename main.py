@@ -14,12 +14,17 @@ class Ff:
 
     An = []
     Bn = []
+    error = []
 
     sm = 0
     T = 2
 
     l_cos = lambda _, x, i: square(x) * cos(i * x)
     l_sin = lambda _, x, i: square(x) * sin(i * x)
+
+    def err(self):
+        for i in range(len(self.square_sig)):
+            self.error.append(self.square_sig[i] - self.sm[i])
 
     def a_n(self):
         for i in range(self.n):
@@ -42,11 +47,14 @@ class Ff:
         self.a_n()
         self.b_n()
         self.main()
+        self.err()
         self.show()
 
     def show(self):
-        plt.plot(self.x, self.square_sig)
-        plt.plot(self.x, self.sm)
+        fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
+        ax1.plot(self.x, self.square_sig)
+        ax1.plot(self.x, self.sm)
+        ax2.plot(self.x, self.error)
         plt.show()
 
 
