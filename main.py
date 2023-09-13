@@ -6,25 +6,28 @@ from math import *
 
 
 class Ff:
-    x = np.linspace(-10, 10, 1000)
 
-    square_sig = square(x) * 2
+    def __init__(self, lp=np.linspace(-10, 10, 1000), amplitude=2, sig=square):
+        self.x = lp
+        self.A = amplitude
+        self.signal = sig(self.x) * self.A
+        self.func = sig
 
-    n = 10
+        self.n = 10
 
-    An = []
-    Bn = []
-    error = []
+        self.An = []
+        self.Bn = []
+        self.error = []
 
-    sm = 0
-    T = 2
+        self.sm = 0
+        self.T = 2
 
-    l_cos = lambda _, x, i: square(x) * cos(i * x)
-    l_sin = lambda _, x, i: square(x) * sin(i * x)
+        self.l_cos = lambda x, i: self.func(x) * cos(i * x)
+        self.l_sin = lambda x, i: self.func(x) * sin(i * x)
 
     def err(self):
-        for i in range(len(self.square_sig)):
-            self.error.append(self.square_sig[i] - self.sm[i])
+        for i in range(len(self.signal)):
+            self.error.append(round(self.signal[i], 5) - round(self.sm[i], 5))
 
     def a_n(self):
         for i in range(self.n):
@@ -40,8 +43,10 @@ class Ff:
         for i in range(self.n):
             if i == 0.0:
                 self.sm += self.An[i] / 2
+
             else:
                 self.sm = self.sm + (self.An[i] * np.cos(i * self.x) + self.Bn[i] * np.sin(i * self.x))
+
 
     def forward(self):
         self.a_n()
@@ -52,11 +57,29 @@ class Ff:
 
     def show(self):
         fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1)
-        ax1.plot(self.x, self.square_sig)
+        ax1.grid(1)
+        ax2.grid(1)
+        ax1.plot(self.x, self.signal)
         ax1.plot(self.x, self.sm)
         ax2.plot(self.x, self.error)
         plt.show()
 
 
-p = Ff()
+x = np.linspace(-10, 10, 1000)
+
+
+def cosine(lp):
+
+    try:
+        cs = []
+        for i in range(len(lp)):
+            cs.append(sin(lp[i]))
+    except TypeError as e:
+        return sin(lp)
+    return np.array(cs)
+
+
+
+
+p = Ff(sig=square)
 p.forward()
