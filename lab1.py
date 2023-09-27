@@ -100,9 +100,9 @@ def cosine(lp):
     try:
         cs = []
         for i in range(len(lp)):
-            cs.append(sin(lp[i]))
+            cs.append(cos(lp[i]))
     except TypeError as e:
-        return sin(lp)
+        return cos(lp)
     return np.array(cs)
 
 
