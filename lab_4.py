@@ -1,23 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.fft import fft, fftfreq
-
-
-#
-# def draw_sign(f,filt,wc,true_sign=None,sign_lim=None):
-#     N = 2000
-# fmax = 2000
-# T = 1/fmax
-# x = np.linspace(0.0, N*T, N)
-# xf = np.linspace(0.0,fmax,N)
-# y = f(x)
-# yf = np.fft.fft(y)
-# 
-# fig = plt.figure(figsize=(12,7))
-# 
-# plt.subplot(1,3,1)
-# plt.plot(xf,np.abs(yf))
-# plt.plot(xf,np.abs(yf)*filt(xf,wc))
+from scipy.fft import fft, ifft
 
 
 def butter_low(w, wc):
@@ -25,7 +8,7 @@ def butter_low(w, wc):
 
 
 def butter_high(w, wc):
-    return (w ** 2) / ((-wc) ** 2 + (1j * np.sqrt(2) * wc * w) + w ** 2)
+    return ((-wc) ** 2 + (1j * np.sqrt(2) * wc * w) + w ** 2) / (wc ** 2)
 
 
 def butter_any(w, wc, n=2):
@@ -63,10 +46,11 @@ class Solution:
         x = np.linspace(0., N * T, N)
         xf = np.linspace(0., fmax, N)
 
-        y = np.cos(2 * np.pi * 50 * x) + np.cos(2 * np.pi * 150 * x) + np.cos(2 * np.pi * 450 * x)
+        y = np.cos(2 * np.pi * 20 * x) + np.cos(2 * np.pi * 150 * x) + np.cos(2 * np.pi * 450 * x)
+
         yf = fft(y)
 
-        fig, axs = plt.subplots(2, 2, figsize=(7, 7))
+        fig, axs = plt.subplots(3, 2, figsize=(7, 7))
 
         for a in axs:
             for ax in a:
@@ -83,13 +67,17 @@ class Solution:
         axs[1, 0].set_title("Low pass filter (70 Hz)")
         axs[1, 0].set_xlim(0, 500)
         axs[1, 0].plot(xf, but * 1000)
-
-        but = np.abs(butter_high(xf, 120))
-        axs[1, 1].plot(xf, np.abs(yf) * but)
+        but_4 = butter_any(xf, 70, 4)
+        but1 = np.abs(butter_high(xf, 70))
+        axs[1, 1].plot(xf, np.abs(yf) * but1 / 800)
         axs[1, 1].set_title("High pass filter (120 Hz)")
-        axs[1, 1].set_xlim(0, 500)
-        axs[1, 1].plot(xf, but * 1000)
+        axs[1, 1].set_xlim(0, 2000)
+        axs[1, 1].plot(xf, but1 * 10 / 8)
+        axs[1, 0].plot(xf, but_4 * 1000)
 
+        axs[2, 0].plot(xf, ifft(np.abs(yf) * but1) / 1000)
+        axs[2, 0].plot(xf, np.cos(2 * np.pi * 450 * x))
+        axs[2, 0].set_xlim(0, 200)
         plt.show()
 
     @staticmethod
@@ -196,7 +184,7 @@ class Solution:
 
 if __name__ == "__main__":
     s = Solution()
-    # s.task_1()
+    s.task_1()
     # s.task_2()
-    # s.task_5(noise=False)
-    s.task_6()
+    # s.task_5(noise=True)
+    # s.task_6()
