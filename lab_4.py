@@ -185,6 +185,6 @@ class Solution:
 if __name__ == "__main__":
     s = Solution()
     s.task_1()
-    # s.task_2()
-    # s.task_5(noise=True)
-    # s.task_6()
+    s.task_2()
+    s.task_5(noise=True)
+    s.task_6()
