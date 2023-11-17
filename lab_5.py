@@ -151,7 +151,7 @@ class Solution:
     def task_3():
         lp = np.linspace(0, 10, 10000)
         sig = np.sin(lp * 40 * np.pi * 2)
-        sig_2 = np.sin(lp * 2 * np.pi * 2)
+        sig_2 = np.sin(lp * 3 * np.pi * 2)
         kern_ = kern(lp)
         fig, axs = make_figure(2, 2, limit=(0, 50))
         axs[0, 0].plot(lp, sig)
@@ -189,7 +189,9 @@ class Solution:
         kern_size = 5
         sigma = 10
         kernel = gaussian_kernel(kern_size, sigma)
-
+        # k_lp = np.linspace(0, 20, 25)
+        # kern_l = np.convolve(lp, kernel.flatten(), mode='same')
+        kern_l = kern(lp)
         blurred_sig = np.convolve(signal, kernel.flatten(), mode='same')
         blurred_sig_spectrum = np.abs(fft(blurred_sig))
 
@@ -200,7 +202,9 @@ class Solution:
         axs[0, 1].plot(fft_lp, spectrum)
         axs[1, 0].plot(lp, blurred_sig)
         axs[1, 0].set_xlim([0, 1])
-        axs[1, 1].plot(fft_lp, blurred_sig_spectrum)
+        axs[1, 1].plot(fft_lp, blurred_sig_spectrum / blurred_sig_spectrum.max())
+        axs[1, 1].plot(fft_lp, np.abs(fft(kern_l)) / 17.5)
+        # axs[1, 1].set_xlim([0, 20])
 
         plt.show()
 
@@ -208,7 +212,7 @@ class Solution:
     def task_5():
         lp = np.linspace(0, 10, 1500)
         signal = np.sin(lp * 2 * np.pi * 2) + np.sin(lp * 10 * np.pi * 2) + np.sin(lp * 15 * np.pi * 2)
-        filt_sig_bp, filt_spec_bp, spec, fft_lp = bandpass_normal_filter(signal, 1, 3, len(lp) / 10)
+        filt_sig_bp, filt_spec_bp, spec, fft_lp = bandpass_normal_filter(signal, 2, 11, len(lp) / 10)
         filt_sig_lp, filt_spec_lp, _, _ = bandpass_normal_filter(signal, 0, 20, len(lp) / 10)
 
         signals = [signal, filt_sig_bp, filt_sig_lp]
@@ -219,24 +223,26 @@ class Solution:
 
     @staticmethod
     def task_6():
-        eps = 0.1
-        low = 14
-        high = 16
-        lp = np.linspace(0, 1, 1000)
+        eps = 0.2
+        low = 5
+        high = 10
+        lp = np.linspace(0, 1, 100000)
         signal = np.sin(lp * 2 * np.pi * 2) + np.sin(lp * 10 * np.pi * 2) + np.sin(lp * 15 * np.pi * 2)
         spec = fft(signal)
         fft_lp = fftfreq(len(lp), 1 / len(lp))
 
         filt_sig, filt_spec = plank(spec, len(lp), low, high, eps=eps)
 
-        signals = [signal, filt_sig]
-        specs = [spec, filt_spec]
+        fl_lp, fl_sp = plank(lp, len(lp), low, high, eps=eps)
+
+        signals = [signal, filt_sig, fl_lp]
+        specs = [spec, filt_spec, fl_sp]
 
         draw_plot(signals, specs, fft_lp=fft_lp, xlims_spectrum=(0, 25), bars=False)
 
     @staticmethod
     def task_7():
-        eps = 0.1
+        eps = 0.2
         low = 14
         high = 16
         lp = np.linspace(0, 1, 1000)
@@ -256,9 +262,9 @@ class Solution:
 
 
 s = Solution()
-# s.task_1()
-# s.task_3()
-# s.task_4()
-# s.task_5()
-# s.task_6()
+s.task_1()
+s.task_3()
+s.task_4()
+s.task_5()
+s.task_6()
 s.task_7()
