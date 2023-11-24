@@ -114,7 +114,7 @@ def plank(spec, n, low, high, eps=0.4):
     temp_plank[low:len(spec)] = result_plank
     result_plank = temp_plank
 
-    filtred_spectrum = spec * result_plank
+    filtred_spectrum = spec * np.abs(result_plank)
 
     filtred_signal = np.fft.ifft(filtred_spectrum)
 
@@ -243,8 +243,8 @@ class Solution:
     @staticmethod
     def task_7():
         eps = 0.2
-        low = 14
-        high = 16
+        low = 12
+        high = 20
         lp = np.linspace(0, 1, 1000)
         signal = np.sin(lp * 2 * np.pi * 2) + np.sin(lp * 10 * np.pi * 2) + np.sin(lp * 15 * np.pi * 2)
         spec = fft(signal)
@@ -262,9 +262,9 @@ class Solution:
 
 
 s = Solution()
-s.task_1()
-s.task_3()
-s.task_4()
-s.task_5()
+# s.task_1()
+# s.task_3()
+# s.task_4()
+# s.task_5()
 s.task_6()
 s.task_7()

@@ -5,18 +5,21 @@ import scipy.io as sio
 from scipy.fft import fft, ifft, fftfreq
 from scipy.signal import square
 from lab_4 import butter_any
+from lab_5 import plank
 
 
 def dec_sampl_easy(lps, sigs, n=2):
-    lp = np.linspace(lps.min(), lps.max(), lps.shape[0] - lps.shape[0] // n)
     sig = []
-    cnt = 0
+    lp = []
+    low = 49
+    high = 51
+    eps = 0.2
     for i in range(len(lps)):
         if i % n != 0:
-            sig.append(sigs[i - cnt])
-        else:
-            cnt += 1
-    return lp, np.array(sig)
+            sig.append(sigs[i])
+            lp.append(lps[i])
+    sig_r, fft_ = plank(fft(sig), len(lp), low, high, eps=eps)
+    return lp, np.array(sig), sig_r
 
 
 def find_half_max(signal):
@@ -176,25 +179,29 @@ def downsample(signal, n=1):
 def task6():
     lp = np.linspace(0, 1, 1000)
     sig_50 = np.sin(lp * 2 * np.pi * 50)
-    sig_100 = np.sin(lp * 2 * np.pi * 100)
-
-    n_lp, n_sig = dec_sampl_easy(lp, sig_50 + sig_100, n=2)
-
+    sig_100 = np.sin(lp * 2 * np.pi * 400)
     sig = sig_50 + sig_100
-    fft_s = fft(sig)
 
-    n = 2
+    n_lp, n_sig, sig_r = dec_sampl_easy(lp, sig, n=2)
 
-    filt = butter_any(fft_s, len(fft_s) // n, n=7) - 1
-    right_n_sig = ifft(filt)[:int(len(filt) // n)]
-    lp_re = np.linspace(0, 1, len(right_n_sig))
+    fft_s = np.abs(fft(sig))
+    fft_lp = fftfreq(len(sig), 1/len(sig))
 
-    plt.plot(lp, sig / sig.max())
+    ds_flp = fftfreq(len(n_sig), 1/len(n_sig))
+    fft_n_sig = np.abs(fft(n_sig))
+
+    plt.plot(lp, sig / sig.max(), "-or")
     print(sig.shape)
-    plt.plot(n_lp, n_sig / n_sig.max())
+    plt.plot(n_lp, n_sig / n_sig.max(), "-og")
     print(n_sig.shape)
-    plt.plot(lp_re, right_n_sig / right_n_sig.max())
-    print(right_n_sig.shape)
+    plt.plot(n_lp, sig_r / sig_r.max(), "-ok")
+    plt.xlim([0, 0.1])
+    # plt.plot(lp_re, right_n_sig / right_n_sig.max())
+    # print(right_n_sig.shape)
+    plt.show()
+    plt.plot(ds_flp, fft_n_sig/fft_n_sig.max())
+    plt.plot(fft_lp, fft_s/fft_s.max())
+    plt.xlim([0, 450])
     plt.show()
 
 
@@ -216,23 +223,23 @@ def task7():
     fft_80 = np.abs(fft(sig_80))
     fft_lp_80 = fftfreq(len(sig_80), 1/len(sig_80))
 
-    # fig, axs = plt.subplots(3, 2, figsize=(10, 10))
-    # axs[0, 0].plot(lp_10, sig_10)
-    # axs[0, 1].plot(fft_lp_10, fft_10)
-    # axs[0, 0].set_title("1000 samples")
-    # axs[0, 1].set_xlim([0, 100])
-    # axs[1, 0].plot(lp_35, sig_35)
-    # axs[1, 1].plot(fft_lp_35, fft_35)
-    # axs[1, 0].set_title("1150 samples")
-    # axs[1, 1].set_xlim([0, 100])
-    # axs[2, 0].plot(lp_80, sig_80)
-    # axs[2, 1].plot(fft_lp_80, fft_80)
-    # axs[2, 0].set_title("1300 samples")
-    # axs[2, 1].set_xlim([0, 100])
-    # plt.show()
+    fig, axs = plt.subplots(3, 2, figsize=(10, 10))
+    axs[0, 0].plot(lp_10, sig_10)
+    axs[0, 1].plot(fft_lp_10, fft_10)
+    axs[0, 0].set_title("1000 samples")
+    axs[0, 1].set_xlim([0, 100])
+    axs[1, 0].plot(lp_35, sig_35)
+    axs[1, 1].plot(fft_lp_35, fft_35)
+    axs[1, 0].set_title("2000 samples")
+    axs[1, 1].set_xlim([0, 100])
+    axs[2, 0].plot(lp_80, sig_80)
+    axs[2, 1].plot(fft_lp_80, fft_80)
+    axs[2, 0].set_title("4000 samples")
+    axs[2, 1].set_xlim([0, 100])
+    plt.show()
 
     fig, axs = plt.subplots(3, 2, figsize=(10, 10))
-    ds_35 = downsample(sig_35)
+    ds_35 = dec_sampl_easy(lp_35, sig_35)
     ds_80 = downsample(sig_80)
     ds_80 = downsample(ds_80[1])
 
@@ -262,5 +269,5 @@ def task7():
 # task3()
 # task4()
 # task5()
-# task6()
-task7()
+task6()
+# task7()
